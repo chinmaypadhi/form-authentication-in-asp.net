@@ -1,0 +1,61 @@
+﻿create database Sample
+use Sample
+
+create table tblUsers(id int identity primary key not null 
+,userName varchar(200),password varchar(200),
+email varchar(200))
+
+sp_rename 'tblusers.passsword_','password_'
+
+select * from tblusers
+
+alter proc spRegisterUser
+@UserName nvarchar(100),
+@password_ nvarchar(200),
+@email nvarchar(200)
+as
+begin
+
+declare @count int
+declare @returncode int
+
+select @count=count(userName) from tblUsers
+ where userName=@UserName
+
+ if @count>0
+ begin
+
+ set @returncode=-1
+ end
+
+ else
+
+ begin
+ set @returncode=1
+ insert into tblUsers values(@UserName,@password_,@email)
+ end
+
+ select @returncode as ReturnValue
+ end
+
+
+
+ Create Procedure spAuthenticateUser
+@UserName nvarchar(100),
+@Password_ nvarchar(100)
+as
+Begin
+ Declare @Count int
+ 
+ Select @Count = COUNT(UserName) from tblUsers
+ where [UserName] = @UserName and [Password_] = @password_
+ 
+ if(@Count = 1)
+ Begin
+  Select 1 as ReturnCode
+ End
+ Else
+ Begin
+  Select -1 as ReturnCode
+ End
+End
